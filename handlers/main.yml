@@ -1,0 +1,24 @@
+---
+- name: Check current kernel version
+  ansible.builtin.shell:
+    cmd: ls -v1r /lib/modules | head -n 1 | grep -qF $(uname -r) || touch {{ reboot_required_file }}
+    creates: "{{ reboot_required_file }}"
+  listen: packages upgraded
+
+- name: Check if a reboot is required
+  ansible.builtin.stat:
+    path: "{{ reboot_required_file }}"
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: reboot_flag
+  changed_when: reboot_flag.stat.exists
+  listen: packages upgraded
+
+- name: Reboot the system if required
+  ansible.builtin.reboot:
+  when:
+    - ansible_connection != "local"
+    - reboot_flag.stat.exists | default(false)
+  listen: packages upgraded
+  throttle: "{{ reboot_system_throttle }}"

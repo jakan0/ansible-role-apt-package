@@ -1,0 +1,26 @@
+---
+- name: Update cache
+  ansible.builtin.apt:
+    cache_valid_time: "{{ apt_package_cache_valid_time }}"
+    update_cache: yes
+  when: not ansible_check_mode
+
+- name: Upgrade packages
+  ansible.builtin.apt:
+    upgrade: "yes"
+  notify: packages upgraded
+  when: not ansible_check_mode
+
+- name: Install packages
+  ansible.builtin.apt:
+    name: "{{ apt_package_install }}"
+    state: present
+  when: not ansible_check_mode
+
+- name: Remove packages
+  ansible.builtin.apt:
+    name: "{{ apt_package_remove }}"
+    state: absent
+    autoclean: yes
+    autoremove: yes
+  when: not ansible_check_mode

@@ -1,0 +1,6 @@
+---
+apt_package_cache_valid_time: 86400
+apt_package_install: []
+apt_package_remove: []
+reboot_required_file: /var/run/reboot-required
+reboot_system_throttle: 1
